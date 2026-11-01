@@ -15,6 +15,7 @@ src/                     data preparation, models, training and attacks
 notes/data_sources.md    dataset links, licenses and data checks
 experiments/summary/     result tables used in the paper
 experiments/hpd_ts2vec_v0/   per-home HPDmobile results
+paper/                   LaTeX source and figures of the preprint
 ```
 
 Raw data, processed arrays, model checkpoints and logs are not tracked.

@@ -1,0 +1,312 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{mathptmx}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{positioning,fit,arrows.meta}
+\usepackage[hidelinks]{hyperref}
+\usepackage{caption}
+\captionsetup{font=small,labelfont=bf}
+
+\newcommand{\sd}[1]{\textsubscript{$\pm$#1}}
+
+\title{Privacy-Preserving Acoustic Occupancy Sensing with One-Second Embeddings and Self-Supervised Temporal Models}
+\author{Myeongwon Chae\\
+School of Architecture\\
+University of Illinois Urbana-Champaign\\
+\texttt{mc130@illinois.edu}
+\and
+Seonghyuk Son\thanks{Corresponding author.}\\
+University of Kentucky\\
+\texttt{sh.son@uky.edu}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Most occupancy sensors in offices respond to motion, so people who sit still are missed and lights or ventilation are turned down while a room is in use. Sound reveals such occupants through typing, coughing or speech, but microphones raise privacy concerns, and occupancy is a state that persists through long quiet periods that a per-window detector cannot represent. We study a two-stage design in which a small on-device encoder maps each second of audio to a low-dimensional embedding and a server-side temporal model turns the embedding stream into an occupancy state. Because no public dataset pairs raw office audio with occupancy labels, we build a room-disjoint benchmark from public recordings (empty-room noise and impulse responses of nine rooms, isolated office sounds and read speech) and test on real office recordings. We attack every representation with speech reconstruction followed by speech recognition, speaker identification and sex classification. On real office recordings the encoder detects human activity with an AUC of 0.87, compared with 0.76 for per-second log-mel statistics. All one-second representations remove linguistic content (at most 1\% of words recovered, versus 94\% for frame-level features), but speaker identity persists: per-second log-mel statistics identify 40 speakers with 94 to 98\% accuracy and the encoder with 69 to 77\%. Noise-floor normalization combined with speaker-adversarial training or a smaller embedding lowers this to 47 to 55\% at an AUC of 0.86 to 0.87. On HPDmobile (six homes, 152 labelled days), a causal temporal encoder pretrained with hierarchical contrastive learning matches hand-crafted features under leave-one-home-out evaluation (AUC 0.75 over three seeds) and is better when each training home has one labelled day (balanced accuracy 0.62 versus 0.57 to 0.59). We close with the office data collection planned to address these limitations.
+\end{abstract}
+
+\section{Introduction}
+
+Lighting and ventilation in many offices are switched by occupancy sensors, and the energy they save depends on how reliably those sensors detect people \citep{guo2010lighting}. Most installed sensors are passive infrared (PIR) or ultrasonic devices that respond to motion. A large part of office work involves little motion, however. People read, type, think or listen to a lecture for long stretches while barely moving.
+
+When an occupant stays still for longer than the sensor's time delay, the sensor reports the room as vacant, and lights or ventilation are turned down while the room is still in use. Longer time delays reduce these false switch-offs but keep lights and fans running in rooms that are already empty \citep{guo2010lighting}. As long as the sensor cannot notice a person who sits still, the control system has to trade comfort against energy.
+
+Several kinds of sensing have been explored to close this gap. Active ultrasonic systems infer occupancy from the way a room responds to emitted chirps \citep{shih2015chirps,shih2016aures}, and multimodal systems combine cameras, microphones and environmental sensors \citep{jacoby2021hpdmobile,tan2022fusion}. Passive listening is a natural fit for still occupants, because people keep making sounds while they sit: they type, click, cough, move their chairs, turn pages and talk. Such sounds have been used to detect occupancy and activities in commercial and residential buildings \citep{ghaffarzadegan2017occupancy,valle2016abroa,santiago2021audio}. A microphone can also capture conversations, so a parallel line of work has designed audio features that allow speech or activity detection while discarding what was said \citep{wyatt2007conversation,parthasarathi2009privacy,parthasarathi2011privacy}, and has estimated crowd size or occupancy from non-speech or deliberately perturbed audio \citep{alhossain2023crowdotic,williams2023privacy}.
+
+Three problems keep these approaches from driving control in offices. First, discarding the words does not make audio private. Common spectral features can be turned back into intelligible speech \citep{milner2002reconstruction,shao2005f0}, and where attacks have been run, information about the speaker survived: age and gender can still be inferred after speech is masked \citep{chhaglani2025featuresense}, and individual speakers could still be identified from perturbed audio that concealed the words \citep{williams2023privacy}. What an attacker can recover from the data a sensor sends, both the words and the speaker, therefore has to be measured for each representation. Second, occupancy is a state with memory. A person working quietly may make a sound only every few minutes, and a detector that judges each short window on its own cannot tell such a room from an empty one. Third, the data needed to study the problem are missing. To our knowledge, no public dataset pairs raw office audio with occupancy labels. HPDmobile \citep{jacoby2021hpdmobile} provides long-term occupancy labels, but for homes and only as a processed amplitude envelope.
+
+This paper works on all three problems with public data only. We split the sensor into two stages (Figure~\ref{fig:overview}). A small encoder on the device turns each second of audio into a short vector (32 numbers in most experiments), and only these numbers leave the device. A temporal model on the server reads the stream of vectors and keeps track of whether the room is occupied, using up to 11 hours of past context. Since no public office audio comes with occupancy labels, we evaluate the two stages separately. For the encoder we build an office benchmark from public recordings of empty rooms, room impulse responses, isolated office sounds and read speech, keep rooms, sound recordings and speakers apart between training and testing, and test on real office recordings. Every representation is then attacked with speech reconstruction followed by speech recognition, with speaker identification and with sex classification. For the temporal model we use the home recordings of HPDmobile and pretrain the network on unlabelled sensor streams with the hierarchical contrastive loss of TS2Vec \citep{yue2022ts2vec}.
+
+The attacks separate two kinds of leakage. Reducing audio to one vector per second removed the words for every representation we tested: at most 1\% of the words were recovered, against 94\% from frame-level features. Averaging did not remove the speaker. Per-second log-mel statistics identified 94 to 98\% of utterances among 40 speakers, and our encoder 77\%. With the noise floor of the room removed from each frequency band, training the encoder against a speaker classifier lowered this to 55\%, and shrinking the vector to 8 numbers lowered it to 47\%, while human activity in real offices was still detected with an AUC of 0.86 to 0.87. Pushing identification further down, to 34\%, cost detection accuracy and made sex easier to predict. In homes, the pretrained temporal model matched hand-crafted features when all labels were used and did better when each training home had a single labelled day.
+
+The same results show what is still missing: no experiment here measures occupancy in an office, speakers can still be identified far above chance, and the two stages have not yet been run together. Section~\ref{sec:limitations} discusses these limits, and Section~\ref{sec:future} describes the office recordings we have planned to address them, which will be reported in a separate article.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw, rounded corners=2pt, align=center, font=\small, minimum height=9mm, inner sep=3pt},
+  arr/.style={-{Stealth[length=2mm]}, thick},
+  lab/.style={font=\scriptsize, align=center}]
+\node[box] (mic) {Microphone\\16\,kHz};
+\node[box, right=5mm of mic] (enc) {Log-mel + noise floor\\CNN encoder (0.59\,M)};
+\node[box, right=5mm of enc] (emb) {32 numbers\\per second};
+\node[box, right=12mm of emb] (head) {Sound classes\\(13 human, 3 device)};
+\node[box, below=7mm of head] (temp) {Temporal model\\(11\,h causal context)};
+\node[box, below=7mm of temp] (ctrl) {Occupancy state\\$\rightarrow$ lighting, HVAC};
+\node[draw, dashed, rounded corners=4pt, fit=(mic)(enc)(emb), inner sep=6pt, label={[lab]above:on device (raw audio never leaves)}] {};
+\node[draw, dashed, rounded corners=4pt, fit=(head)(temp), inner sep=6pt, label={[lab]above:server}] {};
+\node[box, dashed, below=14mm of enc] (att) {Attacker holding the embeddings:\\words? speaker? sex?};
+\draw[arr] (mic) -- (enc);
+\draw[arr] (enc) -- (emb);
+\draw[arr] (emb) -- (head);
+\draw[arr] (head) -- (temp);
+\draw[arr] (temp) -- (ctrl);
+\draw[arr, dashed, gray] (emb.south) |- (att.east);
+\end{tikzpicture}
+\caption{Two-stage design. The device sends one embedding per second (32 numbers in most experiments). The server detects sound classes and infers an occupancy state from hours of context. We evaluate privacy by attacking the transmitted embeddings.}
+\label{fig:overview}
+\end{figure}
+
+\section{Related Work}
+
+\paragraph{Occupancy sensing in buildings.} Occupancy-based lighting control mostly relies on PIR and ultrasonic sensors, whose performance depends on sensor placement, coverage and time-delay settings \citep{guo2010lighting}. Active ultrasonic systems sense occupancy from the acoustic response of a room to emitted chirps \citep{shih2015chirps,shih2016aures}. HPDmobile collected images, processed audio and environmental readings with occupancy labels in six homes \citep{jacoby2021hpdmobile}, and the same group fused these modalities for residential occupancy detection \citep{tan2022fusion}. Domestic activity datasets such as SINS and DCASE 2018 Task 5 label activities, including absence, from multichannel audio \citep{dekkers2017sins,dekkers2018dcase}.
+
+\paragraph{Acoustic occupancy and activity sensing.} Occupancy has been detected from audio in commercial and residential environments \citep{ghaffarzadegan2017occupancy}, with Gaussian mixtures and hidden Markov models \citep{valle2016abroa}, and with engineered audio features for occupancy and activity estimation \citep{santiago2021audio}. Williams et al.\ counted overlapping talkers (1 to 10) in simulated cocktail-party mixtures and made the input privacy-preserving by randomly perturbing audio frames \citep{williams2023privacy}. Crowdotic estimated crowd density in hospital waiting rooms from non-speech audio \citep{alhossain2023crowdotic}. Ambient audio has also been proposed for estimating indoor airborne transmission risk factors, including how occupants are distributed \citep{chhaglani2025ambient}. For office sounds, DCASE 2013 and 2016 provide isolated recordings and annotated mixtures for sound event detection \citep{stowell2015dcase,lafay2017dcase2016}.
+
+\paragraph{Privacy of audio representations.} Privacy-sensitive features for speech detection were designed to discard the information needed to recognize words \citep{wyatt2007conversation,parthasarathi2009privacy,parthasarathi2011privacy}. Mel-frequency cepstral coefficients, however, can be inverted to speech \citep{milner2002reconstruction,shao2005f0}. Chhaglani et al.\ discussed the privacy risks of audio classification and proposed privacy-preserving features \citep{chhaglani2024privacy}, and later showed that age and gender can still be inferred after speech is masked \citep{chhaglani2025featuresense}. Williams et al.\ attacked their perturbed features with speaker and speech recognition and found that the speech content was hidden but individual speakers could still be identified \citep{williams2023privacy}. Adversarial training with a gradient reversal layer \citep{ganin2015grl} is a common way to remove an unwanted attribute from a representation. Privacy concerns in building data more broadly have also motivated learning from anonymized data \citep{choi2026pptl}.
+
+\paragraph{Self-supervised representations.} Contrastive learning yields general-purpose audio representations \citep{saeed2020cola}. TS2Vec learns timestamp-level representations of time series with a hierarchical contrastive loss over random overlapping crops \citep{yue2022ts2vec}. We use this loss to pretrain the temporal occupancy model on unlabelled sensor streams.
+
+\section{Problem Setup and Threat Model}
+\label{sec:setup-threat}
+
+A sensing device in a room records audio $x$ at 16\,kHz. For each second $t$ it computes a representation $r_t$ and sends it to a server; raw audio is not stored or transmitted. The server outputs a human-activity score per second and an occupancy state $y_t \in \{0,1\}$ for control. We require (i) utility: detect human activity, including the quiet sounds of still occupants, in rooms not seen during training; (ii) privacy: $r_t$ should not allow recovery of spoken words, and should reveal as little as possible about who is speaking; and (iii) deployability: a small causal encoder.
+
+The adversary obtains the transmitted representations, for example through a compromised server, and knows the encoder. In the strongest setting we test, the adversary also holds labelled speech of the target speakers and clean, close-talking recordings. The adversary tries to (a) reconstruct speech and transcribe it, (b) identify the speaker among a known set, and (c) infer the speaker's sex. Attacks on the device itself, which has access to raw audio, are out of scope.
+
+\section{Method}
+\label{sec:method}
+
+\paragraph{On-device encoder.} Each second of audio is converted to 64-band log-mel energies (25\,ms windows, 10\,ms hop), giving a $64\times100$ patch. With noise-floor normalization (NF), the 10th percentile of each band over the current 10-s input is subtracted, so features describe deviations from the background of the room and microphone. A convolutional network with four blocks of two $3\times3$ convolutions (32, 64, 128 and 128 channels, batch normalization, ReLU, $2\times2$ average pooling between blocks) is applied to each one-second patch separately. Its output is averaged over frequency, mean- and max-pooled over time, and projected to $d$ dimensions, with $d=32$ unless stated otherwise; we also test $d=8$. The encoder has 0.59 million parameters and no context beyond the current second.
+
+\paragraph{Activity head.} On the server, a layer-normalized two-layer perceptron (128 hidden units) predicts 16 sound classes per second: 13 produced by people (clear throat, cough, door slam, drawer, keyboard, keys, knock, laughter, mouse click, page turn, pen drop, speech, light switch) and 3 produced by devices (alert, phone ringing, printer). Encoder and head are trained with binary cross-entropy. The human-activity score of a second is the largest probability among the human classes.
+
+\paragraph{Speaker-adversarial training.} An adversary network receives the mean and maximum of the embeddings over the speech-active seconds of a training scene and predicts the speaker among 251 training speakers. A gradient reversal layer \citep{ganin2015grl} between encoder and adversary makes the encoder remove information that helps the adversary. The reversal weight rises from 0 to $\lambda \in \{1, 3\}$ with the schedule of \citet{ganin2015grl}.
+
+\paragraph{Temporal occupancy model.} For long-term occupancy we use a causal dilated convolutional encoder: an input projection to 64 channels followed by 10 residual blocks of two convolutions with kernel size 3 and dilation $2^i$, padded on the past side only. Its receptive field is 4,093 steps, which is 11.4 hours at one step per 10\,s. We pretrain it without labels using the hierarchical contrastive loss of TS2Vec \citep{yue2022ts2vec}: two overlapping random crops of a sequence are encoded with random timestamp masking, and representations of the same timestamp are pulled together across crops (instance-wise) and separated from other timestamps of the same sequence (temporal), at every level of a max-pooling hierarchy. For prediction we fit a class-balanced logistic regression on the frozen 64-dimensional representation and the time of day (linear probe). We also report fine-tuning the pretrained network and training the same network from scratch.
+
+\section{Experimental Setup}
+\label{sec:setup}
+
+\subsection{Data}
+Table~\ref{tab:data} lists the public datasets. We used only recordings whose licenses allow research use, and we report the license stated by each host. We downloaded DEMAND but did not use it, because its office and meeting-room recordings contain people and cannot serve as empty-room noise.
+
+\begin{table}[t]
+\centering\small
+\caption{Public datasets used in this study.}
+\label{tab:data}
+\begin{tabular}{@{}p{2.6cm}p{5.2cm}p{2.6cm}p{1.6cm}p{2.4cm}@{}}
+\toprule
+Dataset & Content used & Labels & License & Role \\
+\midrule
+HPDmobile \citep{jacoby2021hpdmobile} & 6 homes, 3 to 5 sensor hubs each, 152 labelled days; 10-s clips of an 80\,Hz rectified amplitude envelope (8\,kHz audio, mean-shifted, rectified, downsampled by 100) & Home occupied, every 10\,s & CC0 & Temporal model \\
+DCASE 2016 Task 2 \citep{lafay2017dcase2016} & 220 isolated office sounds (11 classes); 54 test mixtures of 120\,s & Class, onset, offset & CC BY 3.0 / 4.0 & Event sources; test set \\
+DCASE 2013 OL/OS \citep{stowell2015dcase} & 320 isolated office sounds (16 classes); 11 scripted recordings in real offices (1,601\,s) & Class, onset, offset (two annotators) & CC BY 4.0 & Event sources; real test set \\
+LibriSpeech \citep{panayotov2015librispeech} & train-clean-100 (251 speakers), dev-clean (40), test-clean (40) & Transcript, speaker, sex & CC BY 4.0 & Speech sources; attacks \\
+BUT ReverbDB \citep{szoke2019but} & 9 rooms (3 offices, 2 lecture rooms, meeting room, conference room, hotel room, stairs), 31 microphones; empty-room noise (60\,s) and impulse responses (1\,s) & None & CC BY 4.0 & Backgrounds; room acoustics \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Office benchmark}
+Training examples are 10-s scenes synthesized on the GPU. Each scene takes the empty-room noise of one training room, adds 0 to 4 isolated sounds at random positions with event-to-background ratios drawn from $-10$ to $15$\,dB, and with probability 0.4 adds 2 to 8\,s of speech at a signal-to-noise ratio from $-5$ to $20$\,dB. Every source is convolved with an impulse response of the same room, and a random gain of $\pm10$\,dB is applied to the mixture. A second is labelled with a class if any 10-ms frame of the dry source lies within 30\,dB of the source's loudest frame. We exclude one BUT setup in which a radio played in the background.
+
+The splits do not overlap in rooms, sound instances or speakers. Training uses six rooms (two offices, stairs, hotel room, conference room, one lecture room), the first 15 recordings of each class from each DCASE dataset, and 24 utterances from each of the 251 train-clean-100 speakers. Testing uses (i) 1,200 synthetic scenes (12,000\,s) from three unseen rooms (office L212, lecture room D105, meeting room C236) with the remaining 5 recordings per class and test-clean speech; (ii) the 11 real office recordings of DCASE 2013 OL, labelled with the union of both annotators; and (iii) the 54 DCASE 2016 test mixtures (6,480\,s). Human activity occupies 44.7\%, 41.7\% and 39.4\% of the seconds in these sets. Models are trained for 3,000 steps of 48 scenes (about 400 hours of audio) with AdamW and a one-cycle learning rate up to $2\times10^{-3}$.
+
+\subsection{Baselines}
+We compare the encoder with three fixed representations: log-mel frames at 100\,Hz (64 values, no privacy, reference for attacks only); per-second log-mel statistics (mean and standard deviation of each band, 128 values per second), with and without NF; and an envelope that follows the HPDmobile processing (8\,kHz, mean shift, full-wave rectification, every 100th sample kept, 80 values per second). For fixed representations, the same activity head is trained on the same scenes.
+
+\subsection{Privacy attacks}
+All attacks use LibriSpeech speakers that the encoder never heard and clean, close-talking speech, which favors the attacker.
+\begin{itemize}
+\item \textbf{Speaker identification:} the utterances of each of the 40 test-clean speakers are split alternately into 1,319 for training the attacker and 1,301 for testing. The attacker is a two-layer bidirectional GRU over the representation sequence (strided convolutions first reduce 100\,Hz inputs to 25\,Hz), with mean and max pooling, trained for 40 epochs. Chance is 2.5\%.
+\item \textbf{Sex classification:} the same architecture is trained on dev-clean (2,703 utterances, 40 speakers) and tested on test-clean (2,620 utterances, 40 other speakers). The majority class is 53.0\%.
+\item \textbf{Speech reconstruction:} a decoder (linear layer, convolution, two-layer bidirectional GRU) maps the representation, repeated to 100\,Hz, to an 80-band log-mel spectrogram. It is trained for 15 epochs on dev-clean. For 200 test-clean utterances of at most 30\,s, the reconstruction is inverted with Griffin-Lim \citep{griffin1984signal} and transcribed with Whisper small.en \citep{radford2023whisper}. We report the share of reference words recovered in order (the longest common subsequence of reference and hypothesis words divided by the number of reference words) and STOI \citep{taal2011stoi}. We do not use word error rate as the main metric because the recognizer invents long transcripts for unintelligible input, which pushes it above 100\%.
+\end{itemize}
+
+\subsection{HPDmobile protocol}
+For each home and 10-s slot we summarize every hub's 800-sample clip by six statistics (log of one plus the mean, standard deviation, maximum, and 10th, 50th and 90th percentiles), take the maximum and the mean over hubs, add the fraction of hubs reporting and a missing-data flag, and standardize each feature per home with that home's median and interquartile range (no labels are used). Days without data are kept as gaps so that the time axis is continuous. We evaluate leave-one-home-out: train on five homes and test on the sixth, for every home. Pretraining uses either the five training homes (strict) or all six homes without labels (transductive), since a deployed sensor accumulates unlabelled data at its own site. Baselines are logistic regression and gradient boosting on hand-crafted features (the inputs above, time of day, and trailing means over 1, 5, 30 and 120 minutes), all class-balanced. We report balanced accuracy, F1 of the occupied class at a threshold of 0.5, and AUC, averaged over the six held-out homes, with three random seeds for the full-label runs. For label efficiency we keep the labels of 1, 3 or 7 random days per training home.
+
+\section{Results}
+\label{sec:results}
+
+\subsection{Detecting human activity}
+Table~\ref{tab:utility} reports per-second detection of human activity. The learned encoder outperforms both fixed representations on all three test sets, and the gap is largest on real office recordings (0.834 against 0.682 for log-mel statistics). Noise-floor normalization raises the real-office AUC to 0.869 and doubles the F1 at a fixed threshold, from 0.25 to 0.50, which suggests that much of the remaining error came from differences in recording level between rooms and microphones. Speaker-adversarial training leaves the AUC unchanged (0.863 and 0.874 for $\lambda=1$ and 3) but lowers the F1 at the fixed threshold, so the scores need recalibration. An 8-dimensional embedding keeps most of the performance (0.859 on real offices), but adversarial training at this size lowers the AUC to 0.740.
+
+\begin{table}[t]
+\centering\small
+\caption{Per-second detection of human activity: AUC and F1 at a threshold of 0.5. NF: noise-floor normalization; adv.\ $\lambda$: speaker-adversarial training; $d$: embedding size (32 unless stated).}
+\label{tab:utility}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{2}{c}{Unseen rooms (synthetic)} & \multicolumn{2}{c}{Real offices (DCASE 2013)} & \multicolumn{2}{c}{DCASE 2016 test} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Representation & AUC & F1 & AUC & F1 & AUC & F1 \\
+\midrule
+HPDmobile-style envelope & 0.699 & 0.400 & 0.621 & 0.275 & 0.726 & 0.263 \\
+Log-mel statistics & 0.873 & 0.684 & 0.682 & 0.041 & 0.609 & 0.159 \\
+Log-mel statistics + NF & 0.894 & 0.699 & 0.760 & 0.447 & 0.895 & 0.460 \\
+Encoder & 0.959 & 0.852 & 0.834 & 0.251 & 0.950 & 0.436 \\
+Encoder + adv.\ 1 & 0.958 & 0.751 & 0.832 & 0.170 & 0.935 & 0.365 \\
+Encoder + NF & 0.947 & 0.837 & 0.869 & 0.502 & 0.961 & 0.753 \\
+Encoder + NF + adv.\ 1 & 0.949 & 0.779 & 0.863 & 0.354 & 0.957 & 0.609 \\
+Encoder + NF + adv.\ 3 & 0.945 & 0.698 & 0.874 & 0.237 & 0.964 & 0.354 \\
+Encoder + NF, $d=8$ & 0.954 & 0.830 & 0.859 & 0.462 & 0.966 & 0.705 \\
+Encoder + NF + adv.\ 3, $d=8$ & 0.913 & 0.687 & 0.740 & 0.315 & 0.928 & 0.425 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{What an attacker can recover}
+Table~\ref{tab:privacy} and Figure~\ref{fig:tradeoff} summarize the attacks. Frame-level log-mel features are fully exposed: the reconstructed speech yields 94.3\% of the reference words, the same as Griffin-Lim inversion of the true spectrogram, and the speaker is identified 98.2\% of the time. Reducing the rate to one vector per second removes linguistic content for every representation we tested: at most 1.0\% of words are recovered and STOI falls to 0.38 to 0.44.
+
+Speaker identity does not disappear with the rate. Per-second log-mel statistics still identify 97.8\% of utterances among 40 speakers, most likely because a speaker's pitch range and timbre change little within a sentence and survive averaging over a second, whereas words change within a fraction of a second. The task-trained encoder keeps less identity (76.8\%), noise-floor normalization lowers it to 68.6\%, and adversarial training to 60.3\% ($\lambda=1$) and 55.3\% ($\lambda=3$); sex classification falls from 75.3\% to 60.1\%, close to the 53.0\% majority. Over this range the detection AUC on real offices stays between 0.86 and 0.87 (Figure~\ref{fig:tradeoff}). The HPDmobile-style envelope reveals the least identity (22.4\%) but also detects activity worst.
+
+Shrinking the embedding lowered identification more than adversarial training did. With noise-floor normalization and no adversary, the 8-dimensional embedding identifies 46.6\% of utterances, fewer than any 32-dimensional encoder, at a real-office AUC of 0.859. Adversarial training at this size lowers identification to 33.6\%, but the AUC falls to 0.740 and sex classification rises from 66.7\% to 85.5\%. The adversary is trained to remove speaker identity, not sex, so lowering one attribute need not lower the other.
+
+\begin{table}[t]
+\centering\small
+\caption{Privacy attacks on LibriSpeech speakers unseen by the encoder. Words: share of reference words recovered from reconstructed speech by Whisper. Chance: 2.5\% for speaker identification; majority class 53.0\% for sex. Whisper recovers 94.5\% of the words from the clean audio.}
+\label{tab:privacy}
+\begin{tabular}{@{}llcccc@{}}
+\toprule
+Representation & Rate $\times$ size & Words (\%) & STOI & Speaker ID (\%) & Sex (\%) \\
+\midrule
+Log-mel frames (reference) & 100\,Hz $\times$ 64 & 94.3 & 0.96 & 98.2 & 94.3 \\
+Log-mel statistics & 1\,Hz $\times$ 128 & 0.8 & 0.39 & 97.8 & 88.6 \\
+Log-mel statistics + NF & 1\,Hz $\times$ 128 & 1.0 & 0.39 & 94.2 & 80.5 \\
+HPDmobile-style envelope & 1\,Hz $\times$ 80 & 0.9 & 0.44 & 22.4 & 55.8 \\
+Encoder & 1\,Hz $\times$ 32 & 0.9 & 0.39 & 76.8 & 81.9 \\
+Encoder + adv.\ 1 & 1\,Hz $\times$ 32 & 0.4 & 0.39 & 62.3 & 82.6 \\
+Encoder + NF & 1\,Hz $\times$ 32 & 0.7 & 0.39 & 68.6 & 75.3 \\
+Encoder + NF + adv.\ 1 & 1\,Hz $\times$ 32 & 0.5 & 0.38 & 60.3 & 73.2 \\
+Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 32 & 0.5 & 0.39 & 55.3 & 60.1 \\
+Encoder + NF & 1\,Hz $\times$ 8 & 0.1 & 0.38 & 46.6 & 66.7 \\
+Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 8 & 0.2 & 0.39 & 33.6 & 85.5 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.62\linewidth]{figures/tradeoff.pdf}
+\caption{Privacy and utility. Horizontal: speaker identification accuracy among 40 speakers (lower is more private). Vertical: AUC of human-activity detection on real office recordings. Filled markers use noise-floor normalization (NF); pentagons are 8-dimensional embeddings.}
+\label{fig:tradeoff}
+\end{figure}
+
+\subsection{Occupancy in homes}
+\paragraph{Label alignment and the role of transitions.} Loudness alone predicts home occupancy poorly: the AUC of the 30-minute mean of the loudest hub is 0.70, 0.52, 0.67, 0.44, 0.60 and 0.39 for the six homes, below chance in two of them. Shifting the labels in time did not reveal a clock offset. Instead, averaging the per-minute loudness around label changes shows that every home is loudest in the 10 minutes after an arrival and before a departure (Figure~\ref{fig:transitions}; peak z-scores 0.63 to 1.01). Occupied periods also include long quiet nights. Occupancy is therefore carried by sparse transition events and must be remembered through silence, which motivates a temporal model with hours of context.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.55\linewidth]{figures/transitions.pdf}
+\caption{Loudness around changes of the occupancy label in HPDmobile, averaged over six homes (z-score of the per-minute maximum envelope, 10-min bins).}
+\label{fig:transitions}
+\end{figure}
+
+\paragraph{Leave-one-home-out results.} Table~\ref{tab:hpd} reports the mean over the six held-out homes, averaged over three seeds. The linear probe on the pretrained temporal encoder matches the best hand-crafted baselines in AUC (0.752 with strict and with transductive pretraining, against 0.748 and 0.743) and has the highest balanced accuracy (0.678 and 0.673, against 0.649 and 0.654). Pretraining on the unlabelled audio of the test home did not change these results beyond the variation between seeds. Training the same network end to end, with or without pretraining, generalizes worse to unseen homes (AUC 0.68 to 0.71), which suggests overfitting to the five training homes.
+
+\begin{table}[t]
+\centering\small
+\caption{Home occupancy on HPDmobile, leave-one-home-out. Mean over the six held-out homes, averaged over three seeds; subscripts give the standard deviation over seeds. Strict: pretraining on the five training homes; transductive: pretraining also on the unlabelled audio of the test home. The hand-crafted baselines use no pretraining and gave the same result for every seed.}
+\label{tab:hpd}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+& \multicolumn{3}{c}{Strict} & \multicolumn{3}{c}{Transductive} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+Method & Bal.\ acc. & F1 & AUC & Bal.\ acc. & F1 & AUC \\
+\midrule
+Hand-crafted + logistic regression & 0.649 & 0.676 & 0.748 & 0.649 & 0.676 & 0.748 \\
+Hand-crafted + gradient boosting & 0.654 & 0.712 & 0.743 & 0.654 & 0.712 & 0.743 \\
+Same network, labels only & 0.614\sd{.007} & 0.713\sd{.032} & 0.708\sd{.008} & 0.608\sd{.028} & 0.706\sd{.037} & 0.699\sd{.007} \\
+Pretrained + fine-tuning & 0.605\sd{.018} & 0.704\sd{.042} & 0.684\sd{.033} & 0.596\sd{.018} & 0.658\sd{.032} & 0.686\sd{.020} \\
+Pretrained + linear probe & 0.678\sd{.006} & 0.716\sd{.010} & 0.752\sd{.005} & 0.673\sd{.008} & 0.697\sd{.012} & 0.752\sd{.003} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Label efficiency.} With fewer labels the advantage of pretraining grows (Figure~\ref{fig:labels}, one seed). With one labelled day per training home, the probe reaches a balanced accuracy of 0.616, against 0.565 and 0.590 for the hand-crafted baselines and 0.515 for the network trained from scratch. The probe stays best or tied in AUC at 1, 3 and 7 labelled days (0.691, 0.706 and 0.722).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.55\linewidth]{figures/label_efficiency.pdf}
+\caption{Balanced accuracy on HPDmobile when each training home keeps the labels of 1, 3 or 7 random days (transductive pretraining, seed 0).}
+\label{fig:labels}
+\end{figure}
+
+\section{Limitations}
+\label{sec:limitations}
+
+The first limitation concerns what was measured. The office experiments measure per-second human activity, not occupancy, and the training scenes are synthetic. The only real office test set is small: 11 scripted recordings with 1,601\,s of audio from five rooms. The temporal model, in turn, was trained on homes, with whole-home labels and an amplitude envelope as input, so the two stages of Figure~\ref{fig:overview} have not been evaluated together. In homes, the pretrained model was ahead of hand-crafted features by about 0.02 to 0.03 in balanced accuracy and tied in AUC when all labels were used. Its larger advantage appeared with one to seven labelled days, and those runs used a single seed.
+
+The second concerns privacy. The best encoders that keep detection performance still identify 47 to 55\% of utterances among 40 known speakers, against a chance level of 2.5\%. Sex behaves differently from identity: in the 8-dimensional encoder, stronger adversarial training lowered speaker identification but raised sex classification to 85.5\%. The attacks also cover only part of the threat. They use clean, close-talking English read speech, which makes identification easier than in a real room, but they test a closed set of 40 speakers, one language and attackers that we trained ourselves. A stronger attacker could recover more.
+
+The third concerns calibration. On real office recordings the F1 at a fixed threshold ranges from 0.04 to 0.50 across representations, and it falls with stronger adversarial training even when the AUC does not. Scores therefore have to be calibrated for each room and model before a threshold can drive control.
+
+\section{Future Work}
+\label{sec:future}
+
+The main next step is an office dataset that we will collect ourselves and report in a separate journal article. We plan to record in single-occupant labs, shared labs and lecture rooms on the University of Illinois campus, with several rooms of each kind so that whole rooms can be held out for testing. Each room will be recorded for at least two weeks, including nights and weekends so that the sound of the empty room is captured. The same low-cost device, a single-board computer with a small digital microphone, will be installed in every room next to a commercial PIR sensor. Ground truth will come from entry and exit sign-in sheets and magnetic door sensors with automatic timestamps, and in lecture rooms from class schedules and attendance counts. Sessions in which participants deliberately sit quietly, for example reading for 30 minutes, will test the case that motion sensors miss. For both our sensor and the PIR sensor we will measure how often occupied periods are judged vacant and how long each takes to switch off after people leave. Training the temporal model on these office embedding streams will evaluate the two stages together, and we will repeat the label-efficiency study over several seeds and with pretraining across many buildings. Long-term recording will store only the embeddings computed on the device. Raw audio will be recorded only in short sessions with consenting participants and stored encrypted, and the study will begin only after approval by the university's Institutional Review Board.
+
+For privacy, we will test devices that send only the 16 class probabilities instead of an embedding, add quantization and noise to the transmitted values, and train an adversary for sex alongside the one for speaker identity. The attacks will be repeated with far-field speech recorded in the target rooms, with open-set speaker verification and with other languages.
+
+For calibration, empty periods such as nights occur at every site and need no labels, so the threshold of each room can be set from the scores observed during those periods.
+
+Beyond this paper, we plan to fuse the audio embeddings with PIR and LiDAR sensing, to evaluate closed-loop lighting and ventilation control for energy and comfort, and to extend the study to homes.
+
+\section{Conclusion}
+A one-second acoustic embedding computed on the device can detect the sounds of still occupants in rooms it has never heard, and speech cannot be reconstructed from it. Who is speaking, however, survives the reduction in rate and has to be removed deliberately. Noise-floor normalization combined with adversarial training or a smaller embedding lowered speaker identification from 77\% to 47 to 55\% without losing detection performance, which is progress but still far from chance. In homes, occupancy shows up as short loud transitions separated by long quiet stretches, and a temporal model pretrained without labels makes the best use of this structure when labels are scarce. Office recordings with occupancy labels are the next step.
+
+\section*{Data and Code Availability}
+All datasets are public (Table~\ref{tab:data}). Code for data preparation, training and attacks is available at \url{https://github.com/AaronChae/occupancy-audio-privacy}.
+
+\section*{Ethics Statement}
+This study uses only public datasets under their stated licenses and collects no new data from people. The planned office recordings will follow the Institutional Review Board process described in Section~\ref{sec:future}.
+
+\section*{Acknowledgments}
+This research used the Delta advanced computing and data resource which is supported by the National Science Foundation (award OAC 2005572) and the State of Illinois. Delta is a joint effort of the University of Illinois Urbana-Champaign and its National Center for Supercomputing Applications.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\appendix
+\section{Per-Home Results}
+\begin{table}[h]
+\centering\small
+\caption{AUC per held-out home on HPDmobile (strict pretraining, seed 0).}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Method & H1 & H2 & H3 & H4 & H5 & H6 \\
+\midrule
+Hand-crafted + logistic regression & 0.861 & 0.698 & 0.833 & 0.717 & 0.760 & 0.620 \\
+Hand-crafted + gradient boosting & 0.700 & 0.745 & 0.889 & 0.702 & 0.806 & 0.616 \\
+Same network, labels only & 0.622 & 0.706 & 0.871 & 0.607 & 0.748 & 0.639 \\
+Pretrained + fine-tuning & 0.671 & 0.578 & 0.845 & 0.573 & 0.795 & 0.555 \\
+Pretrained + linear probe & 0.826 & 0.708 & 0.815 & 0.707 & 0.761 & 0.666 \\
+\midrule
+Labelled days & 30 & 17 & 35 & 17 & 15 & 38 \\
+Occupied share (\%) & 82.2 & 60.4 & 78.2 & 81.7 & 75.6 & 46.8 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\end{document}
