@@ -170,7 +170,7 @@ Table~\ref{tab:data} lists the public datasets. We used only recordings whose li
 
 \begin{table}[t]
 \centering\small
-\caption{Public datasets used in this study.}
+\caption{Public datasets.}
 \label{tab:data}
 \begin{tabular}{@{}L{2.6cm}L{5.2cm}L{2.6cm}L{1.6cm}L{2.4cm}@{}}
 \toprule
@@ -252,7 +252,7 @@ Encoder + NF + adv.\ 3, $d=8$ & 0.913 & 0.687 & 0.740 & 0.315 & 0.928 & 0.425 \\
 
 \subsection{What an attacker can recover}
 \label{sec:privacy}
-Table~\ref{tab:privacy} and Figure~\ref{fig:tradeoff} summarize the attacks. Frame-level log-mel features expose everything: the reconstructed speech yields 94.3\% of the reference words, the same as Griffin-Lim inversion of the true spectrogram, and the speaker is identified 98.2\% of the time. Reducing the rate to one vector per second defeats this attack for every representation we tested. At most 1.0\% of the reference words are recovered, and STOI falls to 0.37 to 0.44. This shows that our decoder and recognizer fail, not that every attacker would.
+Table~\ref{tab:privacy} and Figure~\ref{fig:tradeoff} summarize the attacks. Frame-level log-mel features expose everything: the reconstructed speech yields 94.3\% of the reference words, the same as Griffin-Lim inversion of the true spectrogram and close to the 94.5\% that Whisper recovers from the clean audio, and the speaker is identified 98.2\% of the time. Reducing the rate to one vector per second defeats this attack for every representation we tested. At most 1.0\% of the reference words are recovered, and STOI falls to 0.37 to 0.44. This shows that our decoder and recognizer fail, not that every attacker would.
 
 Per-second log-mel statistics, however, still identify 97.8\% of utterances among 40 speakers, so the speaker survives the lower rate. A likely reason is that a speaker's pitch range and timbre change little within a sentence and survive averaging over a second, whereas words change within a fraction of a second. Classical speaker recognition rests on the same fact: the distribution of short-term spectral features over an utterance identifies the speaker \citep{reynolds2000gmm}. The task-trained encoder keeps less identity (76.8\%). NF lowers it to 68.6\%, and adversarial training lowers it further to 60.3\% ($\lambda=1$) and 55.3\% ($\lambda=3$). Sex classification falls from 75.3\% to 60.1\%, close to the 53.0\% majority. The HPDmobile-style envelope reveals the least identity (22.4\%) but also detects activity worst.
 
@@ -264,7 +264,7 @@ Even in the settings that keep detection performance, the attacker still names t
 
 \begin{table}[t]
 \centering\small
-\caption{Privacy attacks on LibriSpeech speakers unseen by the encoder. Words: share of reference words recovered from reconstructed speech by Whisper (Eq.~\ref{eq:recall}). Chance: 2.5\% for speaker identification; majority class 53.0\% for sex. Whisper recovers 94.5\% of the words from the clean audio. Probabilities: only the 16 class probabilities of the activity head are sent, so detection equals that of the same encoder in Table~\ref{tab:utility}.}
+\caption{Privacy attacks on LibriSpeech speakers unseen by the encoder. Words: share of reference words recovered from reconstructed speech by Whisper (Eq.~\ref{eq:recall}). Chance: 2.5\% for speaker identification; majority class 53.0\% for sex. Probabilities: only the 16 class probabilities of the activity head are sent, so detection equals that of the same encoder in Table~\ref{tab:utility}.}
 \label{tab:privacy}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
