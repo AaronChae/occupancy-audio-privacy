@@ -29,7 +29,8 @@ def ncc_max(seg, tpl):
     tpl = tpl - tpl.mean()
     seg = seg - seg.mean()
     num = fftconvolve(seg, tpl[::-1], mode="valid")
-    win = np.convolve(seg ** 2, np.ones(len(tpl)), mode="valid")
+    c = np.concatenate([[0.0], np.cumsum(seg ** 2)])
+    win = np.maximum(c[len(tpl):] - c[: len(seg) - len(tpl) + 1], 0.0)  # windowed energy of seg
     den = np.sqrt(win * (tpl ** 2).sum()) + 1e-9
     return float(np.max(np.abs(num) / den))
 
