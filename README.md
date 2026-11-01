@@ -1,6 +1,6 @@
 # occupancy-audio-privacy
 
-Code for the preprint *Privacy-Aware Occupancy Detection from Sound: What Works and What Leaks* (link will be added after submission).
+Code for the preprint *From Sound to Occupancy: Privacy-Aware Audio Sensing for Buildings* (link will be added after submission).
 
 The work has two parts:
 
