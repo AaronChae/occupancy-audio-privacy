@@ -1,6 +1,6 @@
 # occupancy-audio-privacy
 
-Code for the preprint *Privacy-Aware Acoustic Occupancy Sensing with One-Second Embeddings and a Self-Supervised Temporal Model* (link will be added after submission).
+Code for the preprint *Privacy-Aware Occupancy Detection from Sound: What Works and What Leaks* (link will be added after submission).
 
 The work has two parts:
 
