@@ -1,0 +1,325 @@
+\begin{thebibliography}{39}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Al~Hossain et~al.(2023)Al~Hossain, Tonmoy, Lover, Corey, Alam, and
+  Rahman]{alhossain2023crowdotic}
+Forsad Al~Hossain, Tanjid~Hasan Tonmoy, Andrew~A. Lover, George~A. Corey,
+  Mohammad Arif~Ul Alam, and Tauhidur Rahman.
+\newblock Crowdotic: A privacy-preserving hospital waiting room crowd density
+  estimation with non-speech audio.
+\newblock \emph{arXiv preprint arXiv:2309.10280}, 2023.
+
+\bibitem[{\c{C}}ak{\i}r et~al.(2017){\c{C}}ak{\i}r, Parascandolo, Heittola,
+  Huttunen, and Virtanen]{cakir2017crnn}
+Emre {\c{C}}ak{\i}r, Giambattista Parascandolo, Toni Heittola, Heikki Huttunen,
+  and Tuomas Virtanen.
+\newblock Convolutional recurrent neural networks for polyphonic sound event
+  detection.
+\newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, 25\penalty0 (6):\penalty0 1291--1303, 2017.
+\newblock \doi{10.1109/TASLP.2017.2690575}.
+
+\bibitem[Chhaglani(2025)]{chhaglani2025ambient}
+Bhawana Chhaglani.
+\newblock Privacy-aware ambient audio sensing for healthy indoor spaces.
+\newblock \emph{arXiv preprint arXiv:2512.12471}, 2025.
+
+\bibitem[Chhaglani et~al.(2024)Chhaglani, Gummeson, and
+  Shenoy]{chhaglani2024privacy}
+Bhawana Chhaglani, Jeremy Gummeson, and Prashant Shenoy.
+\newblock Towards privacy-preserving audio classification systems.
+\newblock \emph{arXiv preprint arXiv:2404.18002}, 2024.
+
+\bibitem[Chhaglani et~al.(2025)Chhaglani, Gomasta, Agarwal, Gummeson, and
+  Shenoy]{chhaglani2025featuresense}
+Bhawana Chhaglani, Sarmistha~Sarna Gomasta, Yuvraj Agarwal, Jeremy Gummeson,
+  and Prashant Shenoy.
+\newblock {FeatureSense}: Protecting speaker attributes in always-on audio
+  sensing system.
+\newblock \emph{arXiv preprint arXiv:2505.24115}, 2025.
+
+\bibitem[Choi et~al.(2026)Choi, Lee, Langtry, and Choudhary]{choi2026pptl}
+W.~Choi, S.~Lee, M.~Langtry, and R.~Choudhary.
+\newblock Privacy-preserving transfer learning framework for building energy
+  forecasting with fully anonymized data.
+\newblock \emph{Applied Energy}, 412:\penalty0 127600, 2026.
+\newblock \doi{10.1016/j.apenergy.2026.127600}.
+
+\bibitem[Dekkers et~al.(2017)Dekkers, Lauwereins, Thoen, Adhana, Brouckxon,
+  Van~den Bergh, van Waterschoot, Vanrumste, Verhelst, and
+  Karsmakers]{dekkers2017sins}
+Gert Dekkers, Steven Lauwereins, Bart Thoen, Mulu~Weldegebreal Adhana, Henk
+  Brouckxon, Bertold Van~den Bergh, Toon van Waterschoot, Bart Vanrumste,
+  Marian Verhelst, and Peter Karsmakers.
+\newblock The {SINS} database for detection of daily activities in a home
+  environment using an acoustic sensor network.
+\newblock In \emph{Proceedings of the Detection and Classification of Acoustic
+  Scenes and Events 2017 Workshop (DCASE2017)}, pages 32--36, Munich, Germany,
+  2017.
+
+\bibitem[Dekkers et~al.(2018)Dekkers, Vuegen, van Waterschoot, Vanrumste, and
+  Karsmakers]{dekkers2018dcase}
+Gert Dekkers, Lode Vuegen, Toon van Waterschoot, Bart Vanrumste, and Peter
+  Karsmakers.
+\newblock {DCASE} 2018 challenge, task 5: Monitoring of domestic activities
+  based on multi-channel acoustics.
+\newblock \emph{arXiv preprint arXiv:1807.11246}, 2018.
+
+\bibitem[Elazar and Goldberg(2018)]{elazar2018adversarial}
+Yanai Elazar and Yoav Goldberg.
+\newblock Adversarial removal of demographic attributes from text data.
+\newblock In \emph{Proceedings of the 2018 Conference on Empirical Methods in
+  Natural Language Processing (EMNLP)}, pages 11--21, 2018.
+\newblock \doi{10.18653/v1/D18-1002}.
+
+\bibitem[Ganin and Lempitsky(2015)]{ganin2015grl}
+Yaroslav Ganin and Victor Lempitsky.
+\newblock Unsupervised domain adaptation by backpropagation.
+\newblock In \emph{Proceedings of the 32nd International Conference on Machine
+  Learning (ICML)}, volume~37 of \emph{Proceedings of Machine Learning
+  Research}, pages 1180--1189, 2015.
+
+\bibitem[Ghaffarzadegan et~al.(2017)Ghaffarzadegan, Reiss, Ruhs, Duerichen, and
+  Feng]{ghaffarzadegan2017occupancy}
+Shabnam Ghaffarzadegan, Attila Reiss, Mirko Ruhs, Robert Duerichen, and Zhe
+  Feng.
+\newblock Occupancy detection in commercial and residential environments using
+  audio signal.
+\newblock In \emph{Proceedings of Interspeech}, pages 3802--3806, 2017.
+\newblock \doi{10.21437/Interspeech.2017-524}.
+
+\bibitem[Griffin and Lim(1984)]{griffin1984signal}
+Daniel~W. Griffin and Jae~S. Lim.
+\newblock Signal estimation from modified short-time {F}ourier transform.
+\newblock \emph{IEEE Transactions on Acoustics, Speech, and Signal Processing},
+  32\penalty0 (2):\penalty0 236--243, 1984.
+\newblock \doi{10.1109/TASSP.1984.1164317}.
+
+\bibitem[Guo et~al.(2010)Guo, Tiller, Henze, and Waters]{guo2010lighting}
+X.~Guo, D.~K. Tiller, G.~P. Henze, and C.~E. Waters.
+\newblock The performance of occupancy-based lighting control systems: A
+  review.
+\newblock \emph{Lighting Research and Technology}, 42\penalty0 (4):\penalty0
+  415--431, 2010.
+\newblock \doi{10.1177/1477153510376225}.
+
+\bibitem[Iravantchi et~al.(2021)Iravantchi, Ahuja, Goel, Harrison, and
+  Sample]{iravantchi2021privacymic}
+Yasha Iravantchi, Karan Ahuja, Mayank Goel, Chris Harrison, and Alanson~P.
+  Sample.
+\newblock {PrivacyMic}: Utilizing inaudible frequencies for privacy preserving
+  daily activity recognition.
+\newblock In \emph{Proceedings of the 2021 CHI Conference on Human Factors in
+  Computing Systems}, pages 1--13, 2021.
+\newblock \doi{10.1145/3411764.3445169}.
+
+\bibitem[Jacoby et~al.(2021)Jacoby, Tan, Henze, and
+  Sarkar]{jacoby2021hpdmobile}
+Margarite Jacoby, Sin~Yong Tan, Gregor Henze, and Soumik Sarkar.
+\newblock A high-fidelity residential building occupancy detection dataset.
+\newblock \emph{Scientific Data}, 8:\penalty0 280, 2021.
+\newblock \doi{10.1038/s41597-021-01055-x}.
+
+\bibitem[Kong et~al.(2020)Kong, Cao, Iqbal, Wang, Wang, and
+  Plumbley]{kong2020panns}
+Qiuqiang Kong, Yin Cao, Turab Iqbal, Yuxuan Wang, Wenwu Wang, and Mark~D.
+  Plumbley.
+\newblock {PANNs}: Large-scale pretrained audio neural networks for audio
+  pattern recognition.
+\newblock \emph{IEEE/ACM Transactions on Audio, Speech, and Language
+  Processing}, 28:\penalty0 2880--2894, 2020.
+\newblock \doi{10.1109/TASLP.2020.3030497}.
+
+\bibitem[Lafay et~al.(2017)Lafay, Benetos, and Lagrange]{lafay2017dcase2016}
+Gr{\'e}goire Lafay, Emmanouil Benetos, and Mathieu Lagrange.
+\newblock Sound event detection in synthetic audio: Analysis of the {DCASE}
+  2016 task results.
+\newblock In \emph{Proceedings of the IEEE Workshop on Applications of Signal
+  Processing to Audio and Acoustics (WASPAA)}, 2017.
+\newblock arXiv:1711.05551.
+
+\bibitem[Milner and Shao(2002)]{milner2002reconstruction}
+Ben Milner and Xu~Shao.
+\newblock Speech reconstruction from mel-frequency cepstral coefficients using
+  a source-filter model.
+\newblock In \emph{Proceedings of the International Conference on Spoken
+  Language Processing (ICSLP)}, pages 2421--2424, 2002.
+\newblock \doi{10.21437/ICSLP.2002-110}.
+
+\bibitem[Panayotov et~al.(2015)Panayotov, Chen, Povey, and
+  Khudanpur]{panayotov2015librispeech}
+Vassil Panayotov, Guoguo Chen, Daniel Povey, and Sanjeev Khudanpur.
+\newblock Librispeech: An {ASR} corpus based on public domain audio books.
+\newblock In \emph{Proceedings of the IEEE International Conference on
+  Acoustics, Speech and Signal Processing (ICASSP)}, pages 5206--5210, 2015.
+\newblock \doi{10.1109/ICASSP.2015.7178964}.
+
+\bibitem[Parthasarathi et~al.(2009)Parthasarathi, Magimai-Doss, Bourlard, and
+  Gatica-Perez]{parthasarathi2009privacy}
+Sree Hari~Krishnan Parthasarathi, Mathew Magimai-Doss, Herv{\'e} Bourlard, and
+  Daniel Gatica-Perez.
+\newblock Investigating privacy-sensitive features for speech detection in
+  multiparty conversations.
+\newblock In \emph{Proceedings of Interspeech}, pages 2243--2246, 2009.
+\newblock \doi{10.21437/Interspeech.2009-637}.
+
+\bibitem[Parthasarathi et~al.(2011)Parthasarathi, Gatica-Perez, Bourlard, and
+  Magimai-Doss]{parthasarathi2011privacy}
+Sree Hari~Krishnan Parthasarathi, Daniel Gatica-Perez, Herv{\'e} Bourlard, and
+  Mathew Magimai-Doss.
+\newblock Privacy-sensitive audio features for speech/nonspeech detection.
+\newblock \emph{IEEE Transactions on Audio, Speech, and Language Processing},
+  19\penalty0 (8):\penalty0 2538--2551, 2011.
+\newblock \doi{10.1109/TASL.2011.2151857}.
+
+\bibitem[Radford et~al.(2023)Radford, Kim, Xu, Brockman, McLeavey, and
+  Sutskever]{radford2023whisper}
+Alec Radford, Jong~Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and
+  Ilya Sutskever.
+\newblock Robust speech recognition via large-scale weak supervision.
+\newblock In \emph{Proceedings of the 40th International Conference on Machine
+  Learning (ICML)}, volume 202 of \emph{Proceedings of Machine Learning
+  Research}, pages 28492--28518, 2023.
+
+\bibitem[Reynolds et~al.(2000)Reynolds, Quatieri, and Dunn]{reynolds2000gmm}
+Douglas~A. Reynolds, Thomas~F. Quatieri, and Robert~B. Dunn.
+\newblock Speaker verification using adapted {Gaussian} mixture models.
+\newblock \emph{Digital Signal Processing}, 10\penalty0 (1--3):\penalty0
+  19--41, 2000.
+\newblock \doi{10.1006/dspr.1999.0361}.
+
+\bibitem[Saeed et~al.(2020)Saeed, Grangier, and Zeghidour]{saeed2020cola}
+Aaqib Saeed, David Grangier, and Neil Zeghidour.
+\newblock Contrastive learning of general-purpose audio representations.
+\newblock \emph{arXiv preprint arXiv:2010.10915}, 2020.
+
+\bibitem[Santiago et~al.(2021)Santiago, Jim{\'e}nez, Aguilar, and
+  Montoya]{santiago2021audio}
+Gabriel Santiago, Marvin Jim{\'e}nez, Jose Aguilar, and Edwin Montoya.
+\newblock Audio feature engineering for occupancy and activity estimation in
+  smart buildings.
+\newblock \emph{Electronics}, 10\penalty0 (21):\penalty0 2599, 2021.
+\newblock \doi{10.3390/electronics10212599}.
+
+\bibitem[Shao and Milner(2005)]{shao2005f0}
+Xu~Shao and Ben Milner.
+\newblock Predicting fundamental frequency from mel-frequency cepstral
+  coefficients to enable speech reconstruction.
+\newblock \emph{The Journal of the Acoustical Society of America}, 118\penalty0
+  (2):\penalty0 1134--1143, 2005.
+\newblock \doi{10.1121/1.1953269}.
+
+\bibitem[Shih and Rowe(2015)]{shih2015chirps}
+Oliver Shih and Anthony Rowe.
+\newblock Occupancy estimation using ultrasonic chirps.
+\newblock In \emph{Proceedings of the ACM/IEEE Sixth International Conference
+  on Cyber-Physical Systems (ICCPS)}, pages 149--158, 2015.
+\newblock \doi{10.1145/2735960.2735969}.
+
+\bibitem[Shih et~al.(2016)Shih, Lazik, and Rowe]{shih2016aures}
+Oliver Shih, Patrick Lazik, and Anthony Rowe.
+\newblock {AURES}: A wide-band ultrasonic occupancy sensing platform.
+\newblock In \emph{Proceedings of the 3rd ACM International Conference on
+  Systems for Energy-Efficient Built Environments (BuildSys)}, pages 157--166,
+  2016.
+\newblock \doi{10.1145/2993422.2993580}.
+
+\bibitem[Shokrollahi et~al.(2024)Shokrollahi, Persson, Malekian,
+  Sarkheyli-H{\"a}gele, and Karlsson]{shokrollahi2024pir}
+Azad Shokrollahi, Jan~A. Persson, Reza Malekian, Arezoo Sarkheyli-H{\"a}gele,
+  and Fredrik Karlsson.
+\newblock Passive infrared sensor-based occupancy monitoring in smart
+  buildings: A review of methodologies and machine learning approaches.
+\newblock \emph{Sensors}, 24\penalty0 (5):\penalty0 1533, 2024.
+\newblock \doi{10.3390/s24051533}.
+
+\bibitem[Srivastava et~al.(2019)Srivastava, Bellet, Tommasi, and
+  Vincent]{srivastava2019privacy}
+Brij Mohan~Lal Srivastava, Aur{\'e}lien Bellet, Marc Tommasi, and Emmanuel
+  Vincent.
+\newblock Privacy-preserving adversarial representation learning in {ASR}:
+  Reality or illusion?
+\newblock In \emph{Proceedings of Interspeech}, pages 3700--3704, 2019.
+\newblock \doi{10.21437/Interspeech.2019-2415}.
+
+\bibitem[Stowell et~al.(2015)Stowell, Giannoulis, Benetos, Lagrange, and
+  Plumbley]{stowell2015dcase}
+Dan Stowell, Dimitrios Giannoulis, Emmanouil Benetos, Mathieu Lagrange, and
+  Mark~D. Plumbley.
+\newblock Detection and classification of acoustic scenes and events.
+\newblock \emph{IEEE Transactions on Multimedia}, 17\penalty0 (10):\penalty0
+  1733--1746, 2015.
+\newblock \doi{10.1109/TMM.2015.2428998}.
+
+\bibitem[Sz{\"o}ke et~al.(2019)Sz{\"o}ke, Sk{\'a}cel, Mo{\v{s}}ner, Paliesek,
+  and {\v{C}}ernock{\'y}]{szoke2019but}
+Igor Sz{\"o}ke, Miroslav Sk{\'a}cel, Ladislav Mo{\v{s}}ner, Jakub Paliesek, and
+  Jan {\v{C}}ernock{\'y}.
+\newblock Building and evaluation of a real room impulse response dataset.
+\newblock \emph{IEEE Journal of Selected Topics in Signal Processing},
+  13\penalty0 (4):\penalty0 863--876, 2019.
+\newblock \doi{10.1109/JSTSP.2019.2917582}.
+
+\bibitem[Taal et~al.(2011)Taal, Hendriks, Heusdens, and Jensen]{taal2011stoi}
+Cees~H. Taal, Richard~C. Hendriks, Richard Heusdens, and Jesper Jensen.
+\newblock An algorithm for intelligibility prediction of time-frequency
+  weighted noisy speech.
+\newblock \emph{IEEE Transactions on Audio, Speech, and Language Processing},
+  19\penalty0 (7):\penalty0 2125--2136, 2011.
+\newblock \doi{10.1109/TASL.2011.2114881}.
+
+\bibitem[Tan et~al.(2022)Tan, Jacoby, Saha, Florita, Henze, and
+  Sarkar]{tan2022fusion}
+Sin~Yong Tan, Margarite Jacoby, Homagni Saha, Anthony Florita, Gregor Henze,
+  and Soumik Sarkar.
+\newblock Multimodal sensor fusion framework for residential building occupancy
+  detection.
+\newblock \emph{Energy and Buildings}, 258:\penalty0 111828, 2022.
+\newblock \doi{10.1016/j.enbuild.2021.111828}.
+
+\bibitem[Tomashenko et~al.(2022)Tomashenko, Wang, Vincent, Patino, Srivastava,
+  No{\'e}, Nautsch, Evans, Yamagishi, O'Brien, Chanclu, Bonastre, Todisco, and
+  Maouche]{tomashenko2022voiceprivacy}
+Natalia Tomashenko, Xin Wang, Emmanuel Vincent, Jose Patino, Brij Mohan~Lal
+  Srivastava, Paul-Gauthier No{\'e}, Andreas Nautsch, Nicholas Evans, Junichi
+  Yamagishi, Benjamin O'Brien, Ana{\"i}s Chanclu, Jean-Fran{\c{c}}ois Bonastre,
+  Massimiliano Todisco, and Mohamed Maouche.
+\newblock The {VoicePrivacy} 2020 challenge: Results and findings.
+\newblock \emph{Computer Speech \& Language}, 74:\penalty0 101362, 2022.
+\newblock \doi{10.1016/j.csl.2022.101362}.
+
+\bibitem[Valle(2016)]{valle2016abroa}
+Rafael Valle.
+\newblock {ABROA}: Audio-based room-occupancy analysis using {G}aussian
+  mixtures and hidden {M}arkov models.
+\newblock \emph{arXiv preprint arXiv:1607.07801}, 2016.
+
+\bibitem[Williams et~al.(2023)Williams, Yazdanpanah, and
+  Stein]{williams2023privacy}
+Jennifer Williams, Vahid Yazdanpanah, and Sebastian Stein.
+\newblock Privacy-preserving occupancy estimation.
+\newblock In \emph{Proceedings of the IEEE International Conference on
+  Acoustics, Speech and Signal Processing (ICASSP)}, pages 1--5, 2023.
+\newblock \doi{10.1109/ICASSP49357.2023.10095340}.
+
+\bibitem[Wyatt et~al.(2007)Wyatt, Choudhury, and Bilmes]{wyatt2007conversation}
+Danny Wyatt, Tanzeem Choudhury, and Jeff Bilmes.
+\newblock Conversation detection and speaker segmentation in privacy-sensitive
+  situated speech data.
+\newblock In \emph{Proceedings of Interspeech}, pages 586--589, 2007.
+\newblock \doi{10.21437/Interspeech.2007-256}.
+
+\bibitem[Yue et~al.(2022)Yue, Wang, Duan, Yang, Huang, Tong, and
+  Xu]{yue2022ts2vec}
+Zhihan Yue, Yujing Wang, Juanyong Duan, Tianmeng Yang, Congrui Huang, Yunhai
+  Tong, and Bixiong Xu.
+\newblock {TS2Vec}: Towards universal representation of time series.
+\newblock In \emph{Proceedings of the AAAI Conference on Artificial
+  Intelligence}, pages 8980--8987, 2022.
+\newblock \doi{10.1609/aaai.v36i8.20881}.
+
+\end{thebibliography}
