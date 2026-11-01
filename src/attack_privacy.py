@@ -287,7 +287,7 @@ def main():
 
     slot = gpu_slot()  # noqa: F841
     torch.cuda.empty_cache()
-    os.environ.setdefault("HF_HOME", "/work/nvme/beco/mchae1/hf_cache")
+    os.environ.setdefault("HF_HOME", os.path.abspath("data/hf_cache"))
     from transformers import pipeline
     asr = pipeline("automatic-speech-recognition", model=args.asr, device=0)
     short = [i for i, w in enumerate(te_w) if w.numel() <= 30 * od.SR]   # Whisper's 30-s window
