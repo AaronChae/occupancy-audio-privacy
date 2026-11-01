@@ -76,7 +76,7 @@ These results also show what is still missing. No experiment here measures occup
 \draw[arr] (temp) -- (ctrl);
 \draw[arr, dashed, gray] (emb.south) |- (att.east);
 \end{tikzpicture}
-\caption{Two-stage design. The device sends one embedding per second. The server detects sound classes and infers an occupancy state from hours of context. We evaluate privacy by attacking what the device transmits.}
+\caption{Two-stage design. The device sends one embedding per second; the server detects sound classes and infers an occupancy state from hours of context. The dashed box is the attacker, who holds what the device transmits.}
 \label{fig:overview}
 \end{figure}
 
@@ -290,7 +290,7 @@ Probabilities, Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 16 & 0.1 & 0.37 & 37.5 & 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.62\linewidth]{figures/tradeoff.pdf}
-\caption{Speaker identification accuracy among 40 speakers against the AUC of human-activity detection on real office recordings. Lower identification means less leakage. Filled markers use noise-floor normalization (NF); pentagons are 8-dimensional embeddings; stars (Prob.) send only the 16 class probabilities. The dashed line marks chance.}
+\caption{Speaker identification accuracy among 40 speakers against the AUC of human-activity detection on real office recordings. Filled markers use noise-floor normalization (NF); pentagons are 8-dimensional embeddings; stars (Prob.) send only the 16 class probabilities. The dashed line marks chance.}
 \label{fig:tradeoff}
 \end{figure}
 
