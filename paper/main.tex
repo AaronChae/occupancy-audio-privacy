@@ -170,7 +170,7 @@ Table~\ref{tab:data} lists the public datasets. We used only recordings whose li
 
 \begin{table}[t]
 \centering\small
-\caption{Public datasets.}
+\caption{Public datasets used in the experiments. For each dataset: the part we use, the labels it provides, the license stated by its host, and its role (sources of office sounds, speech and room acoustics for the synthetic scenes, test sets, speech for the privacy attacks, or input to the temporal model).}
 \label{tab:data}
 \begin{tabular}{@{}L{2.6cm}L{5.2cm}L{2.6cm}L{1.6cm}L{2.4cm}@{}}
 \toprule
@@ -228,7 +228,7 @@ Adversarial training changes the real-office AUC by $-0.007$ ($-0.019$ to 0.003)
 
 \begin{table}[t]
 \centering\small
-\caption{Per-second detection of human activity (a sound made by a person in that second): AUC and F1 at a threshold of 0.5. NF: noise-floor normalization; adv.\ $\lambda$: speaker-adversarial training; $d$: embedding size (32 unless stated). Without NF, adversarial training was run only with $\lambda=1$.}
+\caption{Per-second detection of human activity (a sound made by a person in that second) on the three office test sets: 1,200 synthetic scenes in three unseen rooms, the 11 real office recordings of DCASE 2013 OL, and the 54 DCASE 2016 test mixtures. AUC and F1 at a threshold of 0.5. NF: noise-floor normalization; adv.\ $\lambda$: speaker-adversarial training with weight $\lambda$; $d$: embedding size (32 unless stated). Without NF, adversarial training was run only with $\lambda=1$.}
 \label{tab:utility}
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
@@ -264,7 +264,7 @@ Even in the settings that keep detection performance, the attacker still names t
 
 \begin{table}[t]
 \centering\small
-\caption{Privacy attacks on LibriSpeech speakers unseen by the encoder. Words: share of reference words recovered from reconstructed speech by Whisper (Eq.~\ref{eq:recall}). Chance: 2.5\% for speaker identification; majority class 53.0\% for sex. Probabilities: only the 16 class probabilities of the activity head are sent, so detection equals that of the same encoder in Table~\ref{tab:utility}.}
+\caption{Privacy attacks on LibriSpeech test-clean speakers, whom the encoder never heard. Rate $\times$ size: vectors per second and their dimension. Words: share of reference words recovered in order by Whisper from the reconstructed speech (Eq.~\ref{eq:recall}); STOI: short-time objective intelligibility of the reconstructed speech, higher being more intelligible. Speaker ID: closed-set identification among 40 speakers (chance 2.5\%); Sex: binary classification (majority class 53.0\%). Probabilities: only the 16 class probabilities of the activity head are sent, so detection equals that of the same encoder in Table~\ref{tab:utility}.}
 \label{tab:privacy}
 \begin{tabular}{@{}llcccc@{}}
 \toprule
@@ -290,7 +290,7 @@ Probabilities, Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 16 & 0.1 & 0.37 & 37.5 & 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.62\linewidth]{figures/tradeoff.pdf}
-\caption{Speaker identification accuracy among 40 speakers against the AUC of human-activity detection on real office recordings. Filled markers use noise-floor normalization (NF); pentagons are 8-dimensional embeddings; stars (Prob.) send only the 16 class probabilities. The dashed line marks chance.}
+\caption{Speaker identification accuracy among 40 speakers (Table~\ref{tab:privacy}) against the human-activity AUC on the real office recordings (Table~\ref{tab:utility}), one marker per representation. Filled markers use noise-floor normalization (NF); pentagons are 8-dimensional embeddings; stars (Prob.) send only the 16 class probabilities. The dashed line marks chance identification (2.5\%).}
 \label{fig:tradeoff}
 \end{figure}
 
@@ -301,7 +301,7 @@ Probabilities, Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 16 & 0.1 & 0.37 & 37.5 & 
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.55\linewidth]{figures/transitions.pdf}
-\caption{Loudness around changes of the occupancy label in HPDmobile, averaged over six homes (z-score of the per-minute maximum envelope, 10-min bins).}
+\caption{Loudness around changes of the occupancy label in HPDmobile: z-score of the per-minute maximum envelope in 10-min bins, averaged over the six homes, from 3\,h before to 3\,h after an arrival (solid) or a departure (dashed). Time 0 is the label change.}
 \label{fig:transitions}
 \end{figure}
 
@@ -309,7 +309,7 @@ Probabilities, Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 16 & 0.1 & 0.37 & 37.5 & 
 
 \begin{table}[t]
 \centering\small
-\caption{Home occupancy on HPDmobile, leave-one-home-out. Mean over the six held-out homes, averaged over three seeds; subscripts give the standard deviation over seeds. Strict: pretraining on the five training homes; transductive: pretraining also on the unlabelled audio of the test home. The hand-crafted baselines use no pretraining and gave the same result for every seed.}
+\caption{Home occupancy on HPDmobile, leave-one-home-out: balanced accuracy, F1 of the occupied class at a threshold of 0.5, and AUC, averaged over the six held-out homes and over three seeds; subscripts give the standard deviation over seeds. Strict: pretraining on the five training homes; transductive: pretraining also on the unlabelled audio of the test home. The hand-crafted baselines use no pretraining and gave the same result for every seed.}
 \label{tab:hpd}
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
@@ -331,7 +331,7 @@ Pretrained + linear probe & 0.678\sd{.006} & 0.716\sd{.010} & 0.752\sd{.005} & 0
 \begin{figure}[t]
 \centering
 \includegraphics[width=0.55\linewidth]{figures/label_efficiency.pdf}
-\caption{Balanced accuracy on HPDmobile when each training home keeps the labels of 1, 3 or 7 random days (transductive pretraining, seed 0).}
+\caption{Label efficiency on HPDmobile: balanced accuracy, averaged over the six held-out homes, when each training home keeps the labels of 1, 3 or 7 random days or of all days (transductive pretraining, seed 0).}
 \label{fig:labels}
 \end{figure}
 
@@ -370,7 +370,7 @@ This research used the Delta advanced computing and data resource which is suppo
 \section{Per-Home Results}
 \begin{table}[h]
 \centering\small
-\caption{AUC per held-out home on HPDmobile (strict pretraining, seed 0).}
+\caption{AUC on each held-out home of HPDmobile (strict pretraining, seed 0). The last two rows give the number of labelled days and the share of occupied 10-s slots in each home.}
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
 Method & H1 & H2 & H3 & H4 & H5 & H6 \\
@@ -393,7 +393,7 @@ Table~\ref{tab:ci} gives 95\% percentile intervals of the human-activity AUC, ob
 
 \begin{table}[h]
 \centering\small
-\caption{Human-activity AUC with 95\% bootstrap intervals, and AUC per unseen synthetic room.}
+\caption{Human-activity AUC on the two recorded test sets with 95\% bootstrap intervals (2,000 resamplings of whole recordings: 11 for real offices, 54 mixtures for DCASE 2016), and AUC in each unseen synthetic room (400 new scenes per room).}
 \label{tab:ci}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
@@ -419,7 +419,7 @@ Table~\ref{tab:nonspeech} restricts the evaluation to the seconds whose labels c
 
 \begin{table}[h]
 \centering\footnotesize
-\caption{Detection of non-speech human sounds on seconds without speech: AUC (95\% interval), average precision and equal error rate.}
+\caption{Detection of non-speech human sounds: AUC with 95\% bootstrap interval, average precision (AP) and equal error rate (EER) on the seconds whose labels contain no speech, with the non-speech human sounds as positives. Intervals as in Table~\ref{tab:ci}.}
 \label{tab:nonspeech}
 \setlength{\tabcolsep}{2.6pt}
 \begin{tabular}{@{}lccccccccc@{}}
