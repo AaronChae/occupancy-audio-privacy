@@ -18,52 +18,54 @@ t = (np.arange(36) * 10 - 175) / 60
 fig, ax = plt.subplots(figsize=(3.4, 2.0))
 ax.axvline(0, color=LIGHT, lw=0.8, ls="--")
 ax.axhline(0, color=LIGHT, lw=0.6)
-ax.plot(t, arrive, color=INK, lw=1.3, label="arrival")
-ax.plot(t, leave, color=MID, lw=1.3, ls=(0, (4, 1.5)), label="departure")
-ax.set_xlabel("time relative to label change (h)")
-ax.set_ylabel("loudness (z-score)")
+ax.plot(t, arrive, color=INK, lw=1.3, label="Arrival")
+ax.plot(t, leave, color=MID, lw=1.3, ls=(0, (4, 1.5)), label="Departure")
+ax.set_xlabel("Time relative to label change (h)")
+ax.set_ylabel("Loudness (z-score)")
 ax.set_xticks([-3, -2, -1, 0, 1, 2, 3])
 ax.legend(frameon=False, loc="upper left")
 fig.tight_layout(); fig.savefig("figures/transitions.pdf"); plt.close(fig)
 
 # 2. privacy-utility: speaker identification vs. human-activity AUC on real office recordings
 pts = [  # label, speaker id %, AUC (DCASE 2013 OL), marker
-    ("log-mel stats", 97.8, 0.682, "s"), ("log-mel stats + NF", 94.2, 0.760, "s"),
-    ("HPD-style envelope", 22.4, 0.621, "^"),
-    ("encoder", 76.8, 0.834, "o"), ("encoder + adv. 1", 62.3, 0.832, "o"),
-    ("encoder + NF", 68.6, 0.869, "D"), ("encoder + NF + adv. 1", 60.3, 0.863, "D"),
-    ("encoder + NF + adv. 3", 55.3, 0.874, "D"),
-    ("encoder + NF, d = 8", 46.6, 0.859, "p"), ("encoder + NF + adv. 3, d = 8", 33.6, 0.740, "p")]
-fig, ax = plt.subplots(figsize=(3.4, 2.6))
+    ("Log-mel statistics", 97.8, 0.682, "s"), ("Log-mel statistics + NF", 94.2, 0.760, "s"),
+    ("HPDmobile-style envelope", 22.4, 0.621, "^"),
+    ("Encoder", 76.8, 0.834, "o"), ("Encoder + adv. 1", 62.3, 0.832, "o"),
+    ("Encoder + NF", 68.6, 0.869, "D"), ("Encoder + NF + adv. 1", 60.3, 0.863, "D"),
+    ("Encoder + NF + adv. 3", 55.3, 0.874, "D"),
+    ("Encoder + NF, d = 8", 46.6, 0.859, "p"), ("Encoder + NF + adv. 3, d = 8", 33.6, 0.740, "p"),
+    ("Prob., NF", 47.1, 0.869, "*"), ("Prob., NF + adv. 3", 37.5, 0.874, "*")]
+fig, ax = plt.subplots(figsize=(3.4, 3.2))
 ax.axvline(2.5, color=LIGHT, lw=0.8, ls="--")
-ax.text(3.5, 0.605, "chance", color=MID, fontsize=7.5)
-place = {"log-mel stats": (95.8, 0.672, "right"), "log-mel stats + NF": (92.2, 0.750, "right"),
-         "HPD-style envelope": (24.4, 0.627, "left"), "encoder": (78.5, 0.824, "left"),
-         "encoder + adv. 1": (60.5, 0.820, "right"), "encoder + NF": (70.5, 0.871, "left"),
-         "encoder + NF + adv. 1": (62.0, 0.853, "left"), "encoder + NF + adv. 3": (53.5, 0.888, "right"),
-         "encoder + NF, d = 8": (44.6, 0.859, "right"), "encoder + NF + adv. 3, d = 8": (33.6, 0.722, "center")}
+
+place = {"Log-mel statistics": (95.8, 0.672, "right"), "Log-mel statistics + NF": (92.2, 0.750, "right"),
+         "HPDmobile-style envelope": (24.4, 0.627, "left"), "Encoder": (78.5, 0.824, "left"),
+         "Encoder + adv. 1": (60.5, 0.820, "right"), "Encoder + NF": (70.5, 0.871, "left"),
+         "Encoder + NF + adv. 1": (62.0, 0.853, "left"), "Encoder + NF + adv. 3": (57.3, 0.890, "left"),
+         "Encoder + NF, d = 8": (44.6, 0.853, "right"), "Encoder + NF + adv. 3, d = 8": (33.6, 0.722, "center"),
+         "Prob., NF": (47.1, 0.884, "center"), "Prob., NF + adv. 3": (35.5, 0.877, "right")}
 for name, x, y, m in pts:
-    ax.scatter(x, y, marker=m, s=22, facecolor="white" if "NF" not in name else INK, edgecolor=INK, lw=0.8, zorder=3)
+    ax.scatter(x, y, marker=m, s=40 if m == "*" else 22, facecolor="white" if "NF" not in name else INK, edgecolor=INK, lw=0.8, zorder=3)
     tx, ty, ha = place[name]
     ax.text(tx, ty, name, fontsize=7, ha=ha, va="center", color=INK)
 ax.set_xlim(0, 105); ax.set_ylim(0.6, 0.91)
-ax.set_xlabel("speaker identification accuracy (%), lower is better")
-ax.set_ylabel("activity AUC, real office")
+ax.set_xlabel("Speaker identification accuracy (%)")
+ax.set_ylabel("Human-activity AUC, real offices")
 fig.tight_layout(); fig.savefig("figures/tradeoff.pdf"); plt.close(fig)
 
 # 3. label efficiency on HPDmobile (transductive pretraining, seed 0, mean over six held-out homes)
 xs = ["1", "3", "7", "all"]
-ba = {"SSL encoder + linear probe": [0.616, 0.610, 0.646, 0.674],
-      "features + logistic regression": [0.565, 0.592, 0.619, 0.649],
-      "features + gradient boosting": [0.590, 0.557, 0.581, 0.654],
-      "same network, labels only": [0.515, 0.561, 0.588, 0.576]}
+ba = {"Pretrained + linear probe": [0.616, 0.610, 0.646, 0.674],
+      "Hand-crafted + logistic regression": [0.565, 0.592, 0.619, 0.649],
+      "Hand-crafted + gradient boosting": [0.590, 0.557, 0.581, 0.654],
+      "Same network, labels only": [0.515, 0.561, 0.588, 0.576]}
 styles = [(INK, "-", "o"), (MID, "--", "s"), (MID, ":", "^"), (LIGHT, "-", "x")]
 fig, ax = plt.subplots(figsize=(3.4, 2.2))
 for (name, v), (c, ls, m) in zip(ba.items(), styles):
     ax.plot(range(4), v, color=c, ls=ls, marker=m, ms=3.5, lw=1.1, label=name)
 ax.set_xticks(range(4), xs)
-ax.set_xlabel("labelled days per training home")
-ax.set_ylabel("balanced accuracy")
+ax.set_xlabel("Labelled days per training home")
+ax.set_ylabel("Balanced accuracy")
 ax.set_ylim(0.5, 0.7)
 ax.legend(frameon=False, fontsize=7, loc="upper center", bbox_to_anchor=(0.45, -0.3), ncol=2)
 fig.savefig("figures/label_efficiency.pdf", bbox_inches="tight"); plt.close(fig)

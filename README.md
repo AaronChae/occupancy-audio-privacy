@@ -76,3 +76,5 @@ python src/attack_privacy.py --rep learned --ckpt experiments/office_v1/learned_
 ```
 
 `scripts/run_queue_v0.sh` and `scripts/run_queue_v2.sh` run every configuration reported in the paper on one GPU. `src/summarize_results.py` collects the outputs into `experiments/summary/`.
+
+`src/office_ci.py` computes bootstrap intervals of the activity AUC and per-room results for the trained models (`experiments/summary/office_ci_auc.csv`, `office_ci_diff.csv`).
