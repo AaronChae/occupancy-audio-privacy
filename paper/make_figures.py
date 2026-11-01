@@ -6,7 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-plt.rcParams.update({"font.family": "STIXGeneral", "mathtext.fontset": "stix", "font.size": 9,
+plt.rcParams.update({"pdf.fonttype": 42, "font.family": "STIXGeneral", "mathtext.fontset": "stix", "font.size": 9,
                      "axes.linewidth": 0.6, "xtick.major.width": 0.6, "ytick.major.width": 0.6,
                      "axes.spines.top": False, "axes.spines.right": False})
 INK, MID, LIGHT = "#1a1a1a", "#6b6b6b", "#b5b5b5"
