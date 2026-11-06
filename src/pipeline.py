@@ -105,6 +105,31 @@ def parse_time(s):
     return dt.datetime.fromisoformat(s) if s else None
 
 
+def file_start_time(path):
+    """Recording start from the file's creation_time tag (phone recordings carry one), in local time; None if absent."""
+    import shutil
+    import subprocess
+    if shutil.which("ffprobe") is None:
+        return None
+    r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format_tags=creation_time", "-of", "json", str(path)],
+                       capture_output=True, text=True)
+    try:
+        tag = json.loads(r.stdout)["format"]["tags"]["creation_time"]
+        return dt.datetime.fromisoformat(tag.replace("Z", "+00:00")).astimezone().replace(tzinfo=None)
+    except (KeyError, ValueError, json.JSONDecodeError):
+        return None
+
+
+def start_for(audio, given):
+    """--start if given, else the file's creation time (reported), else None."""
+    if given:
+        return parse_time(given)
+    t = file_start_time(audio)
+    if t is not None:
+        print(f"{audio}: no --start given, using the file's creation time {t.isoformat()} (local time)")
+    return t
+
+
 def load_audio(path):
     """16 kHz mono waveform. Formats soundfile cannot read (m4a, mp3, ...) are decoded with ffmpeg."""
     try:
@@ -242,8 +267,9 @@ def representations(enc, feats, dev):
 def cmd_stage1(args):
     dev = "cuda" if torch.cuda.is_available() else "cpu"
     rep, head, meta = load_stage1(args.ckpt, dev)
-    start = parse_time(args.start)
+    start = None
     for audio in args.audio:
+        start = start if start is not None else start_for(audio, args.start)
         wav = load_audio(audio)
         z, p, s = stage1_stream(wav, rep, head, dev)
         out = args.out / (Path(audio).stem + ".npz")
@@ -298,7 +324,7 @@ def cmd_predict(args):
             raise SystemExit("--ckpt is needed to run stage 1 on an audio file")
         rep, head, _ = load_stage1(args.ckpt, dev)
         z, _, s = stage1_stream(load_audio(src), rep, head, dev)
-        start = parse_time(args.start)
+        start = start_for(src, args.start)
     feats, tod, times = slot_features(z, s, start)
     df = pd.DataFrame({"slot": np.arange(len(feats)),
                        "slot_start": [t.isoformat() for t in times] if times is not None else [k * BLOCK for k in range(len(feats))],
@@ -336,7 +362,7 @@ def main():
     s1 = sub.add_parser("stage1", help="audio -> per-second embeddings and activity scores")
     s1.add_argument("audio", nargs="+")
     s1.add_argument("--ckpt", type=Path, required=True, help="model.pt from src/train_office.py")
-    s1.add_argument("--start", default="", help="ISO start time of the first file, e.g. 2026-11-05T09:00:00")
+    s1.add_argument("--start", default="", help="ISO start time of the first file; default: the file's creation_time tag")
     s1.add_argument("--out", type=Path, required=True, help="folder for the .npz streams")
     s1.set_defaults(fn=cmd_stage1)
     pt = sub.add_parser("pretrain", help="TS2Vec pretraining of the temporal encoder on unlabelled streams")
@@ -357,7 +383,7 @@ def main():
     pr = sub.add_parser("predict", help="audio or stream -> occupancy probability per slot")
     pr.add_argument("input", help="audio file or a stage-1 .npz stream")
     pr.add_argument("--ckpt", type=Path, help="stage-1 model.pt (for audio input)")
-    pr.add_argument("--start", default="", help="ISO start time (audio input)")
+    pr.add_argument("--start", default="", help="ISO start time (audio input); default: the file's creation_time tag")
     pr.add_argument("--stage2", type=Path)
     pr.add_argument("--probe", type=Path)
     pr.add_argument("--out", type=Path, required=True)
