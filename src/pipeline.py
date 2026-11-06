@@ -105,6 +105,22 @@ def parse_time(s):
     return dt.datetime.fromisoformat(s) if s else None
 
 
+def load_audio(path):
+    """16 kHz mono waveform. Formats soundfile cannot read (m4a, mp3, ...) are decoded with ffmpeg."""
+    try:
+        return od.load(path)
+    except Exception as e:   # noqa: BLE001
+        import shutil
+        import subprocess
+        import tempfile
+        if shutil.which("ffmpeg") is None:
+            raise SystemExit(f"cannot read {path} ({e}); install ffmpeg to decode this format") from e
+        with tempfile.TemporaryDirectory() as tmp:
+            wav = Path(tmp) / "audio.wav"
+            subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", str(path), "-ac", "1", "-ar", str(SR), str(wav)], check=True)
+            return od.load(wav)
+
+
 def save_stream(path, z, p, s, start, meta):
     path.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(path, z=z.astype(np.float16), p=p.astype(np.float16), s=s.astype(np.float32),
@@ -228,7 +244,7 @@ def cmd_stage1(args):
     rep, head, meta = load_stage1(args.ckpt, dev)
     start = parse_time(args.start)
     for audio in args.audio:
-        wav = od.load(audio)
+        wav = load_audio(audio)
         z, p, s = stage1_stream(wav, rep, head, dev)
         out = args.out / (Path(audio).stem + ".npz")
         save_stream(out, z, p, s, start, {"ckpt": str(args.ckpt), "rep": meta["rep"], "dim": int(z.shape[1]),
@@ -281,7 +297,7 @@ def cmd_predict(args):
         if args.ckpt is None:
             raise SystemExit("--ckpt is needed to run stage 1 on an audio file")
         rep, head, _ = load_stage1(args.ckpt, dev)
-        z, _, s = stage1_stream(od.load(src), rep, head, dev)
+        z, _, s = stage1_stream(load_audio(src), rep, head, dev)
         start = parse_time(args.start)
     feats, tod, times = slot_features(z, s, start)
     df = pd.DataFrame({"slot": np.arange(len(feats)),

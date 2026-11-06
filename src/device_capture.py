@@ -42,8 +42,7 @@ def mic_blocks(device=None):
 
 
 def file_blocks(path):
-    import office_data as od
-    wav = od.load(path)
+    wav = pl.load_audio(path)
     for i in range(0, wav.shape[0], BLOCK_SAMPLES):
         seg = wav[i: i + BLOCK_SAMPLES]
         if seg.shape[0] >= pl.SR:
