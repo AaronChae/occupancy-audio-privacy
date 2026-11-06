@@ -80,3 +80,22 @@ python src/attack_privacy.py --rep learned --ckpt experiments/office_v1/learned_
 `src/office_ci.py` computes bootstrap intervals of the activity AUC and per-room results for the trained models (`experiments/summary/office_ci_auc.csv`, `office_ci_diff.csv`).
 
 `src/office_rescore.py` re-scores the trained models with AUC, average precision and EER on all seconds and on seconds without speech (`experiments/summary/office_rescore.csv`, `office_rescore_ci.json`). `src/check_dcase2016_leak.py` checks by normalized cross-correlation whether the DCASE 2016 test mixtures contain the released training sounds (`experiments/summary/dcase2016_leak.csv`).
+
+## End-to-end pipeline: audio -> stage 1 -> stage 2
+
+The paper evaluates the two stages separately because no public dataset pairs office audio with occupancy labels. `src/pipeline.py` joins them the way a deployment would, on one audio recording:
+
+```
+python src/pipeline.py stage1  --ckpt experiments/office_v1/learned_floor_adv3/model.pt \
+    --start 2026-11-05T09:00:00 --out streams/room1 recordings/room1_day1.wav     # audio -> embeddings per second
+python src/pipeline.py pretrain --streams streams/room1 streams/room2 --out models/stage2.pt   # TS2Vec, no labels
+python src/pipeline.py fit      --streams streams/room1 --labels labels/room1.csv \
+    --stage2 models/stage2.pt --out models/probe.joblib                           # linear probe with labels
+python src/pipeline.py predict  recordings/room1_day2.wav --ckpt .../model.pt --start 2026-11-06T09:00:00 \
+    --stage2 models/stage2.pt --probe models/probe.joblib --out pred.csv          # occupancy per 10-s slot
+python src/pipeline.py evaluate --pred pred.csv --labels labels/room1_day2.csv
+```
+
+Stage 1 runs the trained encoder and activity head in 10-s blocks, as on the device. Stage 2 reads, per 10-s slot, the mean and maximum of the embeddings and three statistics of the human-activity score (plus coverage and a missing flag, 69 channels for d = 32), standardized per site without labels, and uses the temporal encoder, TS2Vec loss and probe of `src/hpd_ts2vec.py`. Labels are interval files (`start,end,occupied`); `src/labels_from_logs.py` builds them from entry and exit logs or head counts. `src/device_capture.py` is the on-device loop: microphone -> stage 1 -> `.npz` streams on disk, audio never written (`--source file` replays a wav for testing).
+
+No stage-2 model trained on embedding streams exists yet; it needs the office recordings planned in the paper. Until then `stage1` and `predict` without `--stage2` give the per-second and per-slot activity scores of the trained encoder. See `notes/pipeline_2026-11-05.md`.
