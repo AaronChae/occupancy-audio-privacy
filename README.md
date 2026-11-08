@@ -12,7 +12,7 @@ The work has two parts:
 ```
 scripts/                 dataset downloads and the experiment queues
 src/                     data preparation, models, training and attacks
-notes/data_sources.md    dataset links, licenses and data checks
+DATA_SOURCES.md          dataset links, licenses and data checks
 experiments/summary/     result tables used in the paper
 experiments/hpd_ts2vec_v0/   per-home HPDmobile results
 paper/                   LaTeX source and figures of the preprint
@@ -31,7 +31,7 @@ python -m venv --system-site-packages .venv
 
 ## Data
 
-All datasets are public. Links and licenses are in `notes/data_sources.md`.
+All datasets are public. Links and licenses are in `DATA_SOURCES.md`.
 
 ```
 bash scripts/download_hpdmobile.sh                  # HPDmobile, 13.6 GB, writes files.tsv
@@ -100,7 +100,7 @@ Stage 1 runs the trained encoder and activity head in 10-s blocks, as on the dev
 
 `models/office_v1/learned_floor_adv3/model.pt` is the trained stage-1 checkpoint of the main configuration (encoder, NF, speaker adversary with λ = 3, 3,000 steps, seed 0), so `stage1` and `predict` run from a clone without Delta.
 
-No stage-2 model trained on embedding streams exists yet; it needs the office recordings planned in the paper. Until then `stage1` and `predict` without `--stage2` give the per-second and per-slot activity scores of the trained encoder. See `notes/pipeline_2026-11-05.md`.
+No stage-2 model trained on embedding streams exists yet; it needs the office recordings planned in the paper. Until then `stage1` and `predict` without `--stage2` give the per-second and per-slot activity scores of the trained encoder.
 
 ## License and citation
 
