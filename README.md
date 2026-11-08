@@ -1,6 +1,6 @@
 # occupancy-audio-privacy
 
-Code for the preprint *From Sound to Occupancy: Privacy-Aware Audio Sensing for Buildings* (link will be added after submission).
+Code for the preprint *From Sound to Occupancy: Privacy-Aware Audio Sensing for Buildings* by Myeongwon Chae and Seonghyuk Son (submitted to arXiv on 2026-11-08; the arXiv link will be added once it is announced).
 
 The work has two parts:
 
@@ -101,3 +101,7 @@ Stage 1 runs the trained encoder and activity head in 10-s blocks, as on the dev
 `models/office_v1/learned_floor_adv3/model.pt` is the trained stage-1 checkpoint of the main configuration (encoder, NF, speaker adversary with λ = 3, 3,000 steps, seed 0), so `stage1` and `predict` run from a clone without Delta.
 
 No stage-2 model trained on embedding streams exists yet; it needs the office recordings planned in the paper. Until then `stage1` and `predict` without `--stage2` give the per-second and per-slot activity scores of the trained encoder. See `notes/pipeline_2026-11-05.md`.
+
+## License and citation
+
+Copyright 2026 Myeongwon Chae. The code is released under the Apache License 2.0 (see `LICENSE` and `NOTICE`). If you use it, please cite the paper; `CITATION.cff` has the reference.

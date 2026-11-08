@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "occupancy-audio-privacy: code for From Sound to Occupancy: Privacy-Aware Audio Sensing for Buildings"
+type: software
+authors:
+  - family-names: Chae
+    given-names: Myeongwon
+    affiliation: "University of Illinois Urbana-Champaign"
+repository-code: "https://github.com/AaronChae/occupancy-audio-privacy"
+license: Apache-2.0
+date-released: 2026-11-08
+preferred-citation:
+  type: article
+  title: "From Sound to Occupancy: Privacy-Aware Audio Sensing for Buildings"
+  authors:
+    - family-names: Chae
+      given-names: Myeongwon
+      affiliation: "University of Illinois Urbana-Champaign"
+    - family-names: Son
+      given-names: Seonghyuk
+      affiliation: "University of Kentucky"
+  journal: "arXiv preprint"
+  year: 2026
+  notes: "arXiv identifier to be added after announcement"
