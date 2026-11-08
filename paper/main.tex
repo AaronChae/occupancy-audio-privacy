@@ -304,7 +304,7 @@ Probabilities, Encoder + NF + adv.\ 3 & 1\,Hz $\times$ 16 & 0.1 & 0.37 & 37.5 & 
 
 \begin{table}[t]
 \centering\small
-\caption{Home occupancy on HPDmobile, leave-one-home-out: balanced accuracy, F1 of the occupied class at a threshold of 0.5, and AUC, averaged over the six held-out homes and over three seeds; subscripts give the standard deviation over seeds. Strict: pretraining on the five training homes; transductive: pretraining also on the unlabelled audio of the test home. The hand-crafted baselines use no pretraining and gave the same result for every seed.}
+\caption{Home occupancy on HPDmobile, leave-one-home-out (Section~\ref{sec:hpd-protocol}), averaged over the six held-out homes and three seeds; subscripts give the standard deviation over seeds. Strict: pretraining on the five training homes; transductive: also on the unlabelled audio of the test home. The hand-crafted baselines use no pretraining and gave the same result for every seed.}
 \label{tab:hpd}
 \begin{tabular}{@{}lcccccc@{}}
 \toprule
@@ -388,7 +388,7 @@ Table~\ref{tab:ci} gives 95\% percentile intervals of the AUC for human-generate
 
 \begin{table}[h]
 \centering\small
-\caption{AUC for human-generated sounds on the two recorded test sets with 95\% bootstrap intervals (2,000 resamplings of whole recordings: 11 for real offices, 54 mixtures for DCASE 2016), and AUC in each unseen synthetic room (400 new scenes per room).}
+\caption{AUC for human-generated sounds: 95\% bootstrap intervals on the two recorded test sets, and AUC in each of the three unseen synthetic rooms.}
 \label{tab:ci}
 \begin{tabular}{@{}lccccc@{}}
 \toprule
@@ -414,7 +414,7 @@ Table~\ref{tab:nonspeech} restricts the evaluation to the seconds whose labels c
 
 \begin{table}[h]
 \centering\footnotesize
-\caption{Detection of non-speech human sounds: AUC with 95\% bootstrap interval, average precision (AP) and equal error rate (EER) on the seconds whose labels contain no speech, with the non-speech human sounds as positives. Intervals as in Table~\ref{tab:ci}.}
+\caption{Detection of non-speech human sounds on the seconds without speech: AUC with 95\% bootstrap interval, average precision (AP) and equal error rate (EER).}
 \label{tab:nonspeech}
 \setlength{\tabcolsep}{2.6pt}
 \begin{tabular}{@{}lccccccccc@{}}
