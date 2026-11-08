@@ -96,7 +96,7 @@ python src/pipeline.py predict  recordings/room1_day2.wav --ckpt .../model.pt --
 python src/pipeline.py evaluate --pred pred.csv --labels labels/room1_day2.csv
 ```
 
-Stage 1 runs the trained encoder and activity head in 10-s blocks, as on the device. Stage 2 reads, per 10-s slot, the mean and maximum of the embeddings and three statistics of the human-activity score (plus coverage and a missing flag, 69 channels for d = 32), standardized per site without labels, and uses the temporal encoder, TS2Vec loss and probe of `src/hpd_ts2vec.py`. Labels are interval files (`start,end,occupied`); `src/labels_from_logs.py` builds them from entry and exit logs or head counts. `src/device_capture.py` is the on-device loop: microphone -> stage 1 -> `.npz` streams on disk, audio never written (`--source file` replays a wav for testing).
+Stage 1 runs the trained encoder and activity head in 10-s blocks, as on the device. Stage 2 reads, per 10-s slot, the mean and maximum of the embeddings and three statistics of the human-activity score (the human-sound score of the paper; plus coverage and a missing flag, 69 channels for d = 32), standardized per site without labels, and uses the temporal encoder, TS2Vec loss and probe of `src/hpd_ts2vec.py`. Labels are interval files (`start,end,occupied`); `src/labels_from_logs.py` builds them from entry and exit logs or head counts. `src/device_capture.py` is the on-device loop: microphone -> stage 1 -> `.npz` streams on disk, audio never written (`--source file` replays a wav for testing).
 
 `models/office_v1/learned_floor_adv3/model.pt` is the trained stage-1 checkpoint of the main configuration (encoder, NF, speaker adversary with λ = 3, 3,000 steps, seed 0), so `stage1` and `predict` run from a clone without Delta.
 
